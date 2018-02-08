@@ -4,11 +4,10 @@
 Created on:18-2-8 14:25
 """
 
-import requests
 import gevent
 import urllib3
-import time
 from lxml import etree
+
 from URPScrapy import db_init
 
 # 登录 (GET)
@@ -69,19 +68,60 @@ class InfoValidate(object):
 		else:
 			# 账号可爬
 			self.account_available.append(account)
-			self.save_valid_account(account)
+			print("账号可用>>>{}".format(account))
+		# self.save_valid_account(account)
 
-	# 保存可用账号
-	def save_valid_account(self, account):
-		db = db_init.connect_db()
-		sql = 'INSERT INTO URP_USER_HEBUST_LG VALUES (NULL,\'{}\')'.format(account)
-		print('>>>{}'.format(sql))
-		db.cursor().execute(sql)
+		# 保存可用账号
+		# def save_valid_account(self, account):
+		# 	db = db_init.connect_db()
+		# 	sql = 'INSERT INTO URP_USER_HEBUST_LG VALUES (NULL,\'{}\')'.format(account)
+		# 	print('>>>{}'.format(sql))
+		# 	db.cursor().execute(sql)
+		# 	db.commit()
+		# 	db.close()
+
+
+class InfoCollect(object):
+	def __init__(self):
+		self.http = urllib3.PoolManager()
+
+	def get_info(self, available):
+		accounts = available
+		for a in accounts:
+			# 先登录，获取 Cookie
+			param = {'zjh': a, 'mm': a}
+			response = self.http.request('GET', URL_LOGIN, fields=param)
+			set_cookie = response.headers['Set-Cookie']
+			headers = {
+				'Set-Cookie': set_cookie
+			}
+			response_xjxx = self.http.request('GET', URL_XJXX, headers=headers)
+			text = response_xjxx.data.decode('GB2312')
+			selector = etree.HTML(text)
+			text_arr = selector.xpath('//td[starts-with(@width,"275")]/text()')
+			# 学籍信息
+			result = []
+			for info in text_arr:
+				result.append(info.strip())
+			self.save_info(result)
+			# 登出
+			self.http.request('POST', URL_LOGOUT, headers=headers)
+
+	def save_info(self, info):
+		db = InfoMain.db
+		sql_str = 'INSERT INTO URP_INFO_HEBUST_LG VALUES (NULL ,'
+		for i in info:
+			sql_str += "\'" + str(i) + "\'" + ','
+		sql_str = sql_str[0:sql_str.__len__() - 1]
+		sql_str += ")"
+		print(sql_str)
+		db.cursor().execute(sql_str)
 		db.commit()
-		db.close()
 
 
 class InfoMain(object):
+	db = db_init.connect_db()
+
 	def autorun(self):
 		account = InfoAccount()
 		# 生成的所有账号
@@ -91,6 +131,8 @@ class InfoMain(object):
 		validator = InfoValidate()
 		validator.validate(all_account=all_account)
 		print(validator.account_available)
+		# collector = InfoCollect()
+		# collector.get_info(validator.account_available)
 
 
 if __name__ == '__main__':
