@@ -19,13 +19,13 @@ class InfoAccount(object):
 		# 年级
 		grade = settings.URP_GRADE
 		# 理工
-		separator = settings.URP_SEPARATOR
+		separator = settings.URP_SEPARATOR.strip()
 		# 学部
 		college = range(settings.URP_COLLEGE_START, settings.URP_COLLEGE_END + 1)
 		# 专业
 		major = range(settings.URP_MAJOR_START, settings.URP_MAJOR_END + 1)
 		# 班级
-		clazz = range(settings.URP_CLASS_START, settings.URP_COLLEGE_END + 1)
+		clazz = range(settings.URP_CLASS_START, settings.URP_CLASS_END + 1)
 		# 学号
 		stu = range(settings.URP_STU_START, settings.URP_STU_END + 1)
 

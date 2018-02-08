@@ -12,11 +12,11 @@ URL_LOGOUT = 'http://lgjwxt.hebust.edu.cn/logout.do?loginType=platformLogin'
 URL_XJXX = 'http://lgjwxt.hebust.edu.cn/xjInfoAction.do?oper=xjxx'
 # 年级
 URP_GRADE = 14
-# 分隔符
+# 分隔符（非理工为'',引号中间无空格)
 URP_SEPARATOR = 'L'
 # 学院（部）
 URP_COLLEGE_START = 1
-URP_COLLEGE_END = 2
+URP_COLLEGE_END = 7
 # 专业
 URP_MAJOR_START = 51
 URP_MAJOR_END = 52
@@ -26,6 +26,5 @@ URP_CLASS_END = 2
 # 学号
 URP_STU_START = 0
 URP_STU_END = 99
-# URP_STU_END = 10
 
 DB_TABLE_NAME = 'URP_INFO_HEBUST_LG_14'
