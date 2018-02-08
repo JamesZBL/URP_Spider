@@ -24,7 +24,7 @@ class InfoAccount(object):
 		# 所有生成的账号
 		self.accounts = []
 		# 年级
-		grade = 15
+		grade = 14
 		# 理工
 		separator = 'L'
 		# 学部
@@ -57,7 +57,7 @@ class InfoValidate(object):
 		param = {"zjh": account, "mm": account}
 		response = http.request('GET', URL_LOGIN, fields=param)
 		print('发送请求>>{}'.format(param))
-		res_text = response.data.decode('GB2312')
+		res_text = response.data.decode('GB2312', 'ignore')
 
 		if res_text.__contains__('密码不正确'):
 			# 密码有误
@@ -93,10 +93,11 @@ class InfoCollect(object):
 			response = self.http.request('GET', URL_LOGIN, fields=param)
 			set_cookie = response.headers['Set-Cookie']
 			headers = {
-				'Set-Cookie': set_cookie
+				'Cookie': set_cookie
 			}
 			response_xjxx = self.http.request('GET', URL_XJXX, headers=headers)
-			text = response_xjxx.data.decode('GB2312')
+			text = response_xjxx.data.decode('GB2312','ignore')
+
 			selector = etree.HTML(text)
 			text_arr = selector.xpath('//td[starts-with(@width,"275")]/text()')
 			# 学籍信息
@@ -131,8 +132,8 @@ class InfoMain(object):
 		validator = InfoValidate()
 		validator.validate(all_account=all_account)
 		print(validator.account_available)
-		# collector = InfoCollect()
-		# collector.get_info(validator.account_available)
+		collector = InfoCollect()
+		collector.get_info(validator.account_available)
 
 
 if __name__ == '__main__':
