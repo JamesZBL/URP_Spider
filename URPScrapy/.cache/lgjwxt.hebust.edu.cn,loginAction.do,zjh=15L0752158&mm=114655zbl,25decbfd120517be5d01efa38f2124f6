@@ -1,0 +1,25 @@
+status: 200
+date: Thu, 08 Feb 2018 01:05:18 GMT
+server: Apache
+cache-control: private
+set-cookie: JSESSIONID=agdFEUIHuRuS94e6J8Yfw; path=/
+content-type: text/html; charset=GBK
+content-location: http://lgjwxt.hebust.edu.cn/loginAction.do?zjh=15L0752158&mm=114655zbl
+
+
+
+<html>
+<head>
+<title>学分制综合教务</title>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312">
+</head>
+<frameset rows="48,*" frameborder="NO" border="0" framespacing="0">
+
+   <frame src="/menu/s_top.jsp" name="topFrame" scrolling="NO" noresize frameborder="NO" border="0" framespacing="0">
+ 
+  <frame src="/menu/mainFrame.jsp" name="bottomFrame" scrolling="Auto" frameborder="NO" border="0" framespacing="0">
+</frameset>
+
+<noframes><body>
+</body></noframes>
+</html>

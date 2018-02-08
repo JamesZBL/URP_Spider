@@ -1,0 +1,27 @@
+status: 200
+date: Thu, 08 Feb 2018 01:05:34 GMT
+server: Apache
+cache-control: private
+set-cookie: JSESSIONID=cdgMZHHh_wdcSbj5J8Yfw; path=/
+content-type: text/html; charset=GBK
+content-location: http://lgjwxt.hebust.edu.cn/timeout.jsp
+
+
+<html>
+<head>
+<SCRIPT>
+//³õÊ¼»¯º¯Êý
+function init(){
+	document.form.action='/logout.do';
+    document.form.target = "_top";
+    document.form.submit();
+}
+setTimeout('init()',0)
+</SCRIPT>
+<title>
+</title>
+</head>
+<body bgcolor="#ffffff">
+<form name="form"/>
+</body>
+</html>
