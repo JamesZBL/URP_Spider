@@ -7,15 +7,8 @@ Created on:18-2-8 14:25
 import gevent
 import urllib3
 from lxml import etree
-
 from URPScrapy import db_init
-
-# 登录 (GET)
-URL_LOGIN = 'http://lgjwxt.hebust.edu.cn/loginAction.do'
-# 登出 (POST only)
-URL_LOGOUT = 'http://lgjwxt.hebust.edu.cn/logout.do?loginType=platformLogin'
-# 学籍信息 (GET)
-URL_XJXX = 'http://lgjwxt.hebust.edu.cn/xjInfoAction.do?oper=xjxx'
+from URPScrapy import settings
 
 
 # 账号生成器
@@ -24,13 +17,13 @@ class InfoAccount(object):
 		# 所有生成的账号
 		self.accounts = []
 		# 年级
-		grade = 14
+		grade = settings.URP_GRADE
 		# 理工
-		separator = 'L'
+		separator = settings.URP_SEPARATOR
 		# 学部
-		college = ['01', '02', '03', '04', '05', '06', '07']
+		college = [range(settings.URP_COLLEGE_START, settings.URP_COLLEGE_END + 1)]
 		# 专业
-		sub = ['51', '52']
+		sub = [range(settings.URP_MAJOR_START, settings.URP_MAJOR_END + 1)]
 
 		for c in college:
 			for s in sub:
@@ -55,7 +48,7 @@ class InfoValidate(object):
 
 	def validate_account(self, http, account):
 		param = {"zjh": account, "mm": account}
-		response = http.request('GET', URL_LOGIN, fields=param)
+		response = http.request('GET', settings.URL_LOGIN, fields=param)
 		print('发送请求>>{}'.format(param))
 		res_text = response.data.decode('GB2312', 'ignore')
 
@@ -69,16 +62,6 @@ class InfoValidate(object):
 			# 账号可爬
 			self.account_available.append(account)
 			print("账号可用>>>{}".format(account))
-		# self.save_valid_account(account)
-
-		# 保存可用账号
-		# def save_valid_account(self, account):
-		# 	db = db_init.connect_db()
-		# 	sql = 'INSERT INTO URP_USER_HEBUST_LG VALUES (NULL,\'{}\')'.format(account)
-		# 	print('>>>{}'.format(sql))
-		# 	db.cursor().execute(sql)
-		# 	db.commit()
-		# 	db.close()
 
 
 class InfoCollect(object):
@@ -90,13 +73,13 @@ class InfoCollect(object):
 		for a in accounts:
 			# 先登录，获取 Cookie
 			param = {'zjh': a, 'mm': a}
-			response = self.http.request('GET', URL_LOGIN, fields=param)
+			response = self.http.request('GET', settings.URL_LOGIN, fields=param)
 			set_cookie = response.headers['Set-Cookie']
 			headers = {
 				'Cookie': set_cookie
 			}
-			response_xjxx = self.http.request('GET', URL_XJXX, headers=headers)
-			text = response_xjxx.data.decode('GB2312','ignore')
+			response_xjxx = self.http.request('GET', settings.URL_XJXX, headers=headers)
+			text = response_xjxx.data.decode('GB2312', 'ignore')
 
 			selector = etree.HTML(text)
 			text_arr = selector.xpath('//td[starts-with(@width,"275")]/text()')
@@ -106,11 +89,11 @@ class InfoCollect(object):
 				result.append(info.strip())
 			self.save_info(result)
 			# 登出
-			self.http.request('POST', URL_LOGOUT, headers=headers)
+			self.http.request('POST', settings.URL_LOGOUT, headers=headers)
 
 	def save_info(self, info):
 		db = InfoMain.db
-		sql_str = 'INSERT INTO URP_INFO_HEBUST_LG VALUES (NULL ,'
+		sql_str = 'INSERT INTO ' + settings.DB_TABLE_NAME + ' VALUES (NULL ,'
 		for i in info:
 			sql_str += "\'" + str(i) + "\'" + ','
 		sql_str = sql_str[0:sql_str.__len__() - 1]

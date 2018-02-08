@@ -47,7 +47,7 @@ def main():
 	conn = connect_db()
 	sql_str = 'create table URP_INFO_HEBUST_LG ('
 	for c in TABLE_COLUMNS:
-		sql_str += c + ' ' + 'varchar(50)' + ','
+		sql_str += c + ' ' + 'varchar(100)' + ','
 	sql_str = sql_str[0:sql_str.__len__() - 1]
 	sql_str += ');'
 	print(sql_str)
