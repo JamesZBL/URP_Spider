@@ -4,6 +4,7 @@
 Created on:18-2-7 16:50
 """
 import pymysql
+from URPRollInfo import settings
 
 TABLE_COLUMNS = [
 	'STUID', 'NAME',
@@ -34,10 +35,10 @@ TABLE_COLUMNS = [
 
 def connect_db():
 	return pymysql.connect(
-		host='localhost',
-		port=3306,
-		user='root',
-		password='root',
-		database='urp_roll_info',
+		host=settings.DB_HOST,
+		port=settings.DB_PORT,
+		user=settings.DB_USER,
+		password=settings.DB_PWD,
+		database=settings.DB_NAME,
 		charset='utf8'
 	)

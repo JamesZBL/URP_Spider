@@ -15,8 +15,8 @@ import gevent
 import urllib3
 from lxml import etree
 
-from URPScrapy import db_init
-from URPScrapy import settings
+from URPRollInfo import db_init
+from URPRollInfo import settings
 
 
 # 账号生成器
