@@ -41,19 +41,3 @@ def connect_db():
 		database='urp_roll_info',
 		charset='utf8'
 	)
-
-
-def main():
-	conn = connect_db()
-	sql_str = 'create table URP_INFO_HEBUST_LG ('
-	for c in TABLE_COLUMNS:
-		sql_str += c + ' ' + 'varchar(100)' + ','
-	sql_str = sql_str[0:sql_str.__len__() - 1]
-	sql_str += ');'
-	print(sql_str)
-	conn.cursor().execute(sql_str)
-	conn.close()
-
-
-if __name__ == '__main__':
-	main()
