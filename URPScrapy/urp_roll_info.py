@@ -140,7 +140,7 @@ class InfoCollect(object):
 		sql_str = 'INSERT INTO ' + settings.DB_TABLE_NAME + ' VALUES (NULL ,'
 		for i in info:
 			sql_str += "\'" + str(i) + "\'" + ','
-		sql_str = sql_str[0:sql_str.__len__() - 1]
+		sql_str = sql_str[0:len(sql_str) - 1]
 		sql_str += ")"
 		self.logger.info(sql_str)
 		db.cursor().execute(sql_str)
@@ -188,9 +188,9 @@ class InfoMain(object):
 		collector = InfoCollect()
 		collector.get_info_queue(validator.account_available)
 		# 计算
-		num_sum = account.accounts.__len__()
-		num_valid = validator.account_valid.__len__()
-		num_available = validator.account_available.__len__()
+		num_sum = len(account.accounts)
+		num_valid = len(validator.account_valid)
+		num_available = len(validator.account_available)
 		num_rate = (num_available / num_valid) * 100
 		self.logger.info('总共尝试：{} 次，其中有效账号：{} 个，有效账号中用户名和密码一致的账号：{} 个，未修改密码的比例为：{:.2f}%'.format(
 			num_sum, num_valid, num_available, num_rate))
