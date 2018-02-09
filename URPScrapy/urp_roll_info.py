@@ -82,12 +82,13 @@ class InfoValidate(object):
 		# 响应体解码
 		res_text = response.data.decode('GB2312', 'ignore')
 
-		if res_text.__contains__('密码不正确'):
+		if res_text.find('密码不正确') > -1:
 			# 密码有误
 			self.account_valid.append(account)
-		elif not res_text.__contains__('证件号不存在'):
+		elif not res_text.find('证件号不存在') > -1:
 			# 账号可爬
 			self.account_available.append(account)
+			self.account_valid.append(account)
 			self.logger.info("账号可用>>>{}".format(account))
 
 
