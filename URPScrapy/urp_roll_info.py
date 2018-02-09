@@ -9,6 +9,8 @@
 Created on:18-2-8 14:25
 """
 
+import sys
+import logging
 import gevent
 import urllib3
 from lxml import etree
@@ -49,6 +51,7 @@ class InfoAccount(object):
 # 账号校验器
 class InfoValidate(object):
 	def __init__(self):
+		self.logger = InfoMain.logger
 		self.http = InfoMain.http
 		# 有效账号
 		self.account_valid = []
@@ -91,6 +94,7 @@ class InfoValidate(object):
 # 信息收集器
 class InfoCollect(object):
 	def __init__(self):
+		self.logger = InfoMain.logger
 		self.http = InfoMain.http
 
 	def get_info_queue(self, accounts):
@@ -145,20 +149,41 @@ class InfoCollect(object):
 
 # 主类
 class InfoMain(object):
+	# 日志
+	logger = logging.getLogger('URPInfo')
+	# 指定logger输出格式
+	formatter = logging.Formatter('%(asctime)s %(levelname)-8s: %(message)s')
+	# 控制台日志
+	console_handler = logging.StreamHandler(sys.stdout)
+	console_handler.formatter = formatter
+	logger.addHandler(console_handler)
+	# 日志输出级别
+	logger.setLevel(logging.INFO)
 	# 数据库连接
 	db = db_init.connect_db()
 	# HTTP 连接池
-	http = urllib3.HTTPConnectionPool(host=settings.HOST, port=80, strict=False, maxsize=100, block=False)
+	http = urllib3.HTTPConnectionPool(
+		host=settings.HOST,
+		port=80,
+		strict=False,
+		maxsize=100,
+		block=False,
+		retries=100,
+		timeout=10
+	)
+
+	def __init__(self):
+		self.logger = InfoMain.logger
 
 	def autorun(self):
 		account = InfoAccount()
 		# 生成的所有账号
 		all_account = account.accounts
-		print(all_account)
+		self.logger.info(all_account)
 		# 校验账号是否可用
 		validator = InfoValidate()
 		validator.validate(all_account=all_account)
-		print(validator.account_available)
+		self.logger.info(validator.account_available)
 		# 收集信息
 		collector = InfoCollect()
 		collector.get_info_queue(validator.account_available)
@@ -167,7 +192,7 @@ class InfoMain(object):
 		num_valid = validator.account_valid.__len__()
 		num_available = validator.account_available.__len__()
 		num_rate = (num_available / num_valid) * 100
-		print('总共尝试：{} 次，其中有效账号：{} 个，有效账号中用户名和密码一致的账号：{} 个，未修改密码的比例为：{:.2f}%'.format(
+		self.logger.info('总共尝试：{} 次，其中有效账号：{} 个，有效账号中用户名和密码一致的账号：{} 个，未修改密码的比例为：{:.2f}%'.format(
 			num_sum, num_valid, num_available, num_rate))
 
 
