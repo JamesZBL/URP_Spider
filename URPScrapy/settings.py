@@ -20,14 +20,14 @@ URL_LOGOUT = '/logout.do?loginType=platformLogin'
 URL_XJXX = '/xjInfoAction.do?oper=xjxx'
 
 # 年级
-URP_GRADE = 14
+URP_GRADE = 17
 
 # 分隔符（非理工为'',引号中间无空格)
 URP_SEPARATOR = 'L'
 # URP_SEPARATOR = ''
 
 # 学院（部）
-URP_COLLEGE_START = 7
+URP_COLLEGE_START = 1
 URP_COLLEGE_END = 7
 
 # 专业
@@ -43,8 +43,7 @@ URP_STU_START = 0
 URP_STU_END = 99
 
 # 表名
-# DB_TABLE_NAME = 'URP_INFO_HEBUST_15'
-DB_TABLE_NAME = 'URP_INFO_HEBUST_LG_14'
+DB_TABLE_NAME = 'URP_INFO_HEBUST_LG_17'
 
 # 超时时间
 SECOND_TIMEOUT = 0
