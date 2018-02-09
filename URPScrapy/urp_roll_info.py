@@ -68,12 +68,12 @@ class InfoValidate(object):
 			'Accept-Encoding': 'gzip, deflate',
 			'Accept-Language': 'zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2',
 			'Cache-Control': 'max-age=0',
-			'Connection': 'close',
+			'Connection': 'Keep-alive',
 			'Host': settings.HOST,
 			'Upgrade-Insecure-Requests': '1',
 			'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:57.0) Gecko/20100101 Firefox/57.0'
 		}
-		response = http.request('GET', settings.URL_LOGIN, fields=param, headers=headers)
+		response = http.request('POST', settings.URL_LOGIN, fields=param, headers=headers)
 		print('发送请求>>{}'.format(param))
 		print(response.status)
 		# 响应体解码
@@ -82,10 +82,7 @@ class InfoValidate(object):
 		if res_text.__contains__('密码不正确'):
 			# 密码有误
 			self.account_valid.append(account)
-		elif res_text.__contains__('你输入的证件号不存在，请您重新输入！'):
-			# 证件号无效
-			pass
-		else:
+		elif not res_text.__contains__('证件号不存在'):
 			# 账号可爬
 			self.account_available.append(account)
 			print("账号可用>>>{}".format(account))

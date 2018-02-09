@@ -9,7 +9,7 @@ HOST = 'jw.hebust.edu.cn'
 # 端口号
 PORT = 80
 
-# 登录 (GET)
+# 登录 (POST)
 URL_LOGIN = '/loginAction.do'
 
 # 登出 (POST only)
