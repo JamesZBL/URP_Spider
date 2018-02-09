@@ -84,6 +84,7 @@ class InfoValidate(object):
 			print("账号可用>>>{}".format(account))
 
 
+# 信息收集器
 class InfoCollect(object):
 	def __init__(self):
 		self.http = InfoMain.http
@@ -133,6 +134,7 @@ class InfoCollect(object):
 		db.commit()
 
 
+# 主类
 class InfoMain(object):
 	db = db_init.connect_db()
 	http = urllib3.HTTPConnectionPool(settings.HOST, 80)
