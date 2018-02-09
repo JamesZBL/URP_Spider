@@ -101,17 +101,18 @@ class InfoCollect(object):
 	def get_info(self, stuid):
 		# 登录
 		param = {'zjh': stuid, 'mm': stuid}
-		response = self.http.request('GET', settings.URL_LOGIN, fields=param)
+		response = self.http.request('POST', settings.URL_LOGIN, fields=param)
 		# 保存 Cookie
-		set_cookie = response.headers['Set-Cookie']
+		cookie = response.headers['Set-Cookie'].replace('; path=/', '')
 		headers = {
 			'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
 			'Accept-Encoding': 'gzip, deflate',
 			'Accept-Language': 'zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2',
-			'Cache-Control': 'max-age=0',
-			'Connection': 'close',
-			'Cookie': set_cookie,
+			'Connection': 'keep-alive',
+			'Cookie': cookie,
+			'Cache-Control': 'no-chache',
 			'Host': settings.HOST,
+			'Pragma': 'no-chache',
 			'Upgrade-Insecure-Requests': '1',
 			'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:57.0) Gecko/20100101 Firefox/57.0'
 		}
