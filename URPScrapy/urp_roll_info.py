@@ -7,6 +7,7 @@ Created on:18-2-8 14:25
 import gevent
 import urllib3
 from lxml import etree
+
 from URPScrapy import db_init
 from URPScrapy import settings
 
@@ -36,12 +37,13 @@ class InfoAccount(object):
 					for s in stu:
 						stuid = str(grade).zfill(2) + separator + str(c).zfill(2) + str(m).zfill(2) + str(cl) + str(
 							s).zfill(2)
-						self.accounts.append(stuid)  # 账号校验器
+						self.accounts.append(stuid)
 
 
+# 账号校验器
 class InfoValidate(object):
 	def __init__(self):
-		self.http = urllib3.PoolManager()
+		self.http = InfoMain.http
 		# 有效账号
 		self.account_valid = []
 		# 可爬账号
@@ -59,7 +61,7 @@ class InfoValidate(object):
 			'Accept-Language': 'zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2',
 			'Cache-Control': 'max-age=0',
 			'Connection': 'close',
-			'Host': 'lgjwxt.hebust.edu.cn',
+			'Host': settings.HOST,
 			'Upgrade-Insecure-Requests': '1',
 			'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:57.0) Gecko/20100101 Firefox/57.0'
 		}
@@ -84,7 +86,7 @@ class InfoValidate(object):
 
 class InfoCollect(object):
 	def __init__(self):
-		self.http = urllib3.PoolManager()
+		self.http = InfoMain.http
 
 	def get_info_queue(self, accounts):
 		jobs = [gevent.spawn(self.get_info, a) for a in accounts]
@@ -102,11 +104,11 @@ class InfoCollect(object):
 			'Cache-Control': 'max-age=0',
 			'Connection': 'close',
 			'Cookie': set_cookie,
-			'Host': 'lgjwxt.hebust.edu.cn',
+			'Host': settings.HOST,
 			'Upgrade-Insecure-Requests': '1',
 			'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:57.0) Gecko/20100101 Firefox/57.0'
 		}
-		response_xjxx = self.http.request('GET', settings.URL_XJXX, headers=headers)
+		response_xjxx = self.http.request('GET', settings.HOST + settings.URL_XJXX, headers=headers)
 		text = response_xjxx.data.decode('GB2312', 'ignore')
 
 		selector = etree.HTML(text)
@@ -117,7 +119,7 @@ class InfoCollect(object):
 			result.append(info.strip())
 		self.save_info(result)
 		# 登出
-		self.http.request('POST', settings.URL_LOGOUT, headers=headers)
+		self.http.request('POST', settings.HOST + settings.URL_LOGOUT, headers=headers)
 
 	def save_info(self, info):
 		db = InfoMain.db
@@ -133,6 +135,7 @@ class InfoCollect(object):
 
 class InfoMain(object):
 	db = db_init.connect_db()
+	http = urllib3.HTTPConnectionPool(settings.HOST, 80)
 
 	def autorun(self):
 		account = InfoAccount()
