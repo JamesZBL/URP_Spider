@@ -56,10 +56,12 @@ class InfoValidate(object):
 		self.account_available = []
 
 	def validate(self, all_account):
+		# 将所有校验过程加入队列
 		jobs = [gevent.spawn(self.validate_account, self.http, a) for a in all_account]
 		gevent.joinall(jobs, timeout=settings.SECOND_TIMEOUT)
 
 	def validate_account(self, http, account):
+		# 登录请求参数
 		param = {"zjh": account, "mm": account}
 		headers = {
 			'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
@@ -73,9 +75,8 @@ class InfoValidate(object):
 		}
 		response = http.request('GET', settings.URL_LOGIN, fields=param, headers=headers)
 		print('发送请求>>{}'.format(param))
-		# fixme
 		print(response.status)
-		# fixme
+		# 响应体解码
 		res_text = response.data.decode('GB2312', 'ignore')
 
 		if res_text.__contains__('密码不正确'):
@@ -96,13 +97,15 @@ class InfoCollect(object):
 		self.http = InfoMain.http
 
 	def get_info_queue(self, accounts):
+		# 将所有信息收集过程加入队列
 		jobs = [gevent.spawn(self.get_info, a) for a in accounts]
 		gevent.joinall(jobs, timeout=settings.SECOND_TIMEOUT)
 
 	def get_info(self, stuid):
-		# 先登录，获取 Cookie
+		# 登录
 		param = {'zjh': stuid, 'mm': stuid}
 		response = self.http.request('GET', settings.URL_LOGIN, fields=param)
+		# 保存 Cookie
 		set_cookie = response.headers['Set-Cookie']
 		headers = {
 			'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
@@ -115,9 +118,10 @@ class InfoCollect(object):
 			'Upgrade-Insecure-Requests': '1',
 			'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:57.0) Gecko/20100101 Firefox/57.0'
 		}
+		# 带 Cookie 访问学籍信息页
 		response_xjxx = self.http.request('GET', settings.HOST + settings.URL_XJXX, headers=headers)
 		text = response_xjxx.data.decode('GB2312', 'ignore')
-
+		# 解析页面内容
 		selector = etree.HTML(text)
 		text_arr = selector.xpath('//td[starts-with(@width,"275")]/text()')
 		# 学籍信息
@@ -129,6 +133,7 @@ class InfoCollect(object):
 		self.http.request('POST', settings.HOST + settings.URL_LOGOUT, headers=headers)
 
 	def save_info(self, info):
+		# 信息持久化
 		db = InfoMain.db
 		sql_str = 'INSERT INTO ' + settings.DB_TABLE_NAME + ' VALUES (NULL ,'
 		for i in info:
@@ -142,7 +147,9 @@ class InfoCollect(object):
 
 # 主类
 class InfoMain(object):
+	# 数据库连接
 	db = db_init.connect_db()
+	# HTTP 连接池
 	http = urllib3.HTTPConnectionPool(host=settings.HOST, port=80, strict=False, maxsize=100, block=True)
 
 	def autorun(self):
@@ -150,10 +157,11 @@ class InfoMain(object):
 		# 生成的所有账号
 		all_account = account.accounts
 		print(all_account)
-		# 账号校验器
+		# 校验账号是否可用
 		validator = InfoValidate()
 		validator.validate(all_account=all_account)
 		print(validator.account_available)
+		# 收集信息
 		collector = InfoCollect()
 		collector.get_info_queue(validator.account_available)
 		# 计算
