@@ -108,16 +108,16 @@ class InfoCollect(object):
 			'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
 			'Accept-Encoding': 'gzip, deflate',
 			'Accept-Language': 'zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2',
-			'Connection': 'keep-alive',
+			'Cache-Control': 'no-cache',
+			'Connection': 'Keep-alive',
 			'Cookie': cookie,
-			'Cache-Control': 'no-chache',
 			'Host': settings.HOST,
-			'Pragma': 'no-chache',
-			'Upgrade-Insecure-Requests': '1',
+			'Pragma': 'no-cache',
+			'Upgrade-Insecure-Requests': 1,
 			'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:57.0) Gecko/20100101 Firefox/57.0'
 		}
 		# 带 Cookie 访问学籍信息页
-		response_xjxx = self.http.request('GET', settings.HOST + settings.URL_XJXX, headers=headers)
+		response_xjxx = self.http.request('GET', settings.URL_XJXX, headers=headers)
 		text = response_xjxx.data.decode('GB2312', 'ignore')
 		# 解析页面内容
 		selector = etree.HTML(text)
@@ -128,7 +128,7 @@ class InfoCollect(object):
 			result.append(info.strip())
 		self.save_info(result)
 		# 登出
-		self.http.request('POST', settings.HOST + settings.URL_LOGOUT, headers=headers)
+		self.http.request('POST', settings.URL_LOGOUT, headers=headers)
 
 	def save_info(self, info):
 		# 信息持久化
@@ -148,7 +148,7 @@ class InfoMain(object):
 	# 数据库连接
 	db = db_init.connect_db()
 	# HTTP 连接池
-	http = urllib3.HTTPConnectionPool(host=settings.HOST, port=80, strict=False, maxsize=100, block=True)
+	http = urllib3.HTTPConnectionPool(host=settings.HOST, port=80, strict=False, maxsize=100, block=False)
 
 	def autorun(self):
 		account = InfoAccount()
