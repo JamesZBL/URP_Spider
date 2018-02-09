@@ -35,7 +35,8 @@ class InfoAccount(object):
 			for m in major:
 				for cl in clazz:
 					for s in stu:
-						stuid = str(grade).zfill(2) + separator + str(c).zfill(2) + str(m).zfill(2) + str(cl) + str(
+						stuid = str(grade).zfill(2) + separator + str(c).zfill(2) + str(m).zfill(2) + str(cl).zfill(
+							1) + str(
 							s).zfill(2)
 						self.accounts.append(stuid)
 
@@ -137,7 +138,7 @@ class InfoCollect(object):
 # 主类
 class InfoMain(object):
 	db = db_init.connect_db()
-	http = urllib3.HTTPConnectionPool(settings.HOST, 80)
+	http = urllib3.HTTPConnectionPool(host=settings.HOST, port=80, strict=False, maxsize=100, block=True)
 
 	def autorun(self):
 		account = InfoAccount()
