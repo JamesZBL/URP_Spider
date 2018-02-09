@@ -192,7 +192,7 @@ class InfoMain(object):
 		num_sum = len(account.accounts)
 		num_valid = len(validator.account_valid)
 		num_available = len(validator.account_available)
-		num_rate = (num_available / num_valid) * 100
+		num_rate = (num_available / num_valid) * 100 if num_valid > 0 else 0
 		self.logger.info('总共尝试：{} 次，其中有效账号：{} 个，有效账号中用户名和密码一致的账号：{} 个，未修改密码的比例为：{:.2f}%'.format(
 			num_sum, num_valid, num_available, num_rate))
 
