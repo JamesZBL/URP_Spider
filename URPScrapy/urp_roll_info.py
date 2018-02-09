@@ -169,7 +169,7 @@ class InfoMain(object):
 		strict=False,
 		maxsize=100,
 		block=False,
-		retries=100,
+		retries=1000,
 		timeout=10
 	)
 
