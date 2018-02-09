@@ -77,8 +77,8 @@ class InfoValidate(object):
 			'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:57.0) Gecko/20100101 Firefox/57.0'
 		}
 		response = http.request('POST', settings.URL_LOGIN, fields=param, headers=headers)
-		print('发送请求>>{}'.format(param))
-		print(response.status)
+		self.logger.info('发送请求>>{}'.format(param))
+		self.logger.info(response.status)
 		# 响应体解码
 		res_text = response.data.decode('GB2312', 'ignore')
 
@@ -88,7 +88,7 @@ class InfoValidate(object):
 		elif not res_text.__contains__('证件号不存在'):
 			# 账号可爬
 			self.account_available.append(account)
-			print("账号可用>>>{}".format(account))
+			self.logger.info("账号可用>>>{}".format(account))
 
 
 # 信息收集器
@@ -142,7 +142,7 @@ class InfoCollect(object):
 			sql_str += "\'" + str(i) + "\'" + ','
 		sql_str = sql_str[0:sql_str.__len__() - 1]
 		sql_str += ")"
-		print(sql_str)
+		self.logger.info(sql_str)
 		db.cursor().execute(sql_str)
 		db.commit()
 
