@@ -48,7 +48,7 @@ URP_STU_END = 50
 DB_HOST = 'localhost'
 
 # 数据库端口号
-DB_PORT = '3306'
+DB_PORT = 3306
 
 # 数据库名
 DB_NAME = 'URP_ROLL_INFO'
