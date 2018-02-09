@@ -166,13 +166,9 @@ class InfoMain(object):
 		num_sum = account.accounts.__len__()
 		num_valid = validator.account_valid.__len__()
 		num_available = validator.account_available.__len__()
-		str_num_rate = "%.2f%%" % ((num_available / num_valid) * 100)
-		print('总共尝试：{} 次，其中有效账号：{} 个，有效账号中用户名和密码一致的账号：{} 个，未修改密码的比例为：{}'.format(
-			num_sum,
-			num_valid,
-			num_available,
-			str_num_rate
-		))
+		num_rate = (num_available / num_valid) * 100
+		print('总共尝试：{} 次，其中有效账号：{} 个，有效账号中用户名和密码一致的账号：{} 个，未修改密码的比例为：{:.2f}%'.format(
+			num_sum, num_valid, num_available, num_rate))
 
 
 if __name__ == '__main__':
