@@ -143,7 +143,7 @@ class InfoCollect(object):
 		if self.mod_get_roll_img:
 			response_xjzp = self.http.request('GET', settings.URL_XJZP, headers=headers)
 			image = Image.open(BytesIO(response_xjzp.data))
-			image.save('H:/img.jpg')
+			image.save(settings.PATH_IMG_SAVE + '/' + stuid + '.jpg')
 
 		# 登出
 		self.http.request('POST', settings.URL_LOGOUT, headers=headers)
