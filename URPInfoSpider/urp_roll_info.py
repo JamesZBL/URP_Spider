@@ -13,6 +13,7 @@ import sys
 import logging
 import gevent
 import urllib3
+import pathlib
 from PIL import Image
 from io import BytesIO
 from lxml import etree
@@ -143,7 +144,13 @@ class InfoCollect(object):
 		if self.mod_get_roll_img:
 			response_xjzp = self.http.request('GET', settings.URL_XJZP, headers=headers)
 			image = Image.open(BytesIO(response_xjzp.data))
-			image.save(settings.PATH_IMG_SAVE + '/' + stuid + '.jpg')
+			setpath = settings.PATH_IMG_SAVE
+			path = pathlib.Path(setpath)
+			if not path.exists():
+				path.mkdir()
+			setpath = setpath + '/' + stuid + '.jpg'
+			image.save(setpath)
+			self.logger.info('保存照片>>>{}'.format(setpath))
 
 		# 登出
 		self.http.request('POST', settings.URL_LOGOUT, headers=headers)
