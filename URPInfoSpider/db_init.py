@@ -4,7 +4,7 @@
 Created on:18-2-7 16:50
 """
 import pymysql
-from URPRollInfo import settings
+from URPInfoSpider import settings
 
 TABLE_COLUMNS = [
 	'STUID', 'NAME',
