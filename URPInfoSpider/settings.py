@@ -66,7 +66,7 @@ DB_PWD = 'root'
 DB_TABLE_NAME = 'URP_INFO_HEBUST_17'
 
 # 照片保存路径
-PATH_IMG_SAVE = 'H:/URPRollPhoto_HEBUST_14'
+PATH_IMG_SAVE = 'H:/URPRollPhoto_HEBUST_17'
 
 # 获取学籍信息
 MOD_ROLL_INFO = False
