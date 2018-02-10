@@ -20,6 +20,7 @@ from lxml import etree
 
 from URPInfoSpider import db_init
 from URPInfoSpider import settings
+from URPInfoSpider.headers import headers
 
 
 # 账号生成器
@@ -69,17 +70,8 @@ class InfoValidate(object):
 	def validate_account(self, http, account):
 		# 登录请求参数
 		param = {"zjh": account, "mm": account}
-		headers = {
-			'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-			'Accept-Encoding': 'gzip, deflate',
-			'Accept-Language': 'zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2',
-			'Cache-Control': 'max-age=0',
-			'Connection': 'Keep-alive',
-			'Host': settings.SERVER_HOST,
-			'Upgrade-Insecure-Requests': '1',
-			'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:57.0) Gecko/20100101 Firefox/57.0'
-		}
-		response = http.request('POST', settings.URL_LOGIN, fields=param, headers=headers)
+		header = headers.header
+		response = http.request('POST', settings.URL_LOGIN, fields=param, headers=header)
 		self.logger.info('发送请求>>{}'.format(param))
 		self.logger.info(response.status)
 		# 响应体解码
@@ -115,22 +107,12 @@ class InfoCollect(object):
 		response = self.http.request('POST', settings.URL_LOGIN, fields=param)
 		# 保存 Cookie
 		cookie = response.headers['Set-Cookie'].replace('; path=/', '')
-		headers = {
-			'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-			'Accept-Encoding': 'gzip, deflate',
-			'Accept-Language': 'zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2',
-			'Cache-Control': 'no-cache',
-			'Connection': 'Keep-alive',
-			'Cookie': cookie,
-			'Host': settings.SERVER_HOST,
-			'Pragma': 'no-cache',
-			'Upgrade-Insecure-Requests': 1,
-			'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:57.0) Gecko/20100101 Firefox/57.0'
-		}
+		header = headers.header
+		header['cookie'] = cookie
 		# 学籍信息
 		if self.mod_get_roll_info:
 			# 带 Cookie 访问学籍信息页
-			response_xjxx = self.http.request('GET', settings.URL_XJXX, headers=headers)
+			response_xjxx = self.http.request('GET', settings.URL_XJXX, headers=header)
 			text = response_xjxx.data.decode('GB2312', 'ignore')
 			# 解析页面内容
 			selector = etree.HTML(text)
@@ -142,7 +124,7 @@ class InfoCollect(object):
 			self.save_info(result)
 		# 学籍照片
 		if self.mod_get_roll_img:
-			response_xjzp = self.http.request('GET', settings.URL_XJZP, headers=headers)
+			response_xjzp = self.http.request('GET', settings.URL_XJZP, headers=header)
 			image = Image.open(BytesIO(response_xjzp.data))
 			setpath = settings.PATH_IMG_SAVE
 			path = pathlib.Path(setpath)
@@ -153,7 +135,7 @@ class InfoCollect(object):
 			self.logger.info('保存照片>>>{}'.format(setpath))
 
 		# 登出
-		self.http.request('POST', settings.URL_LOGOUT, headers=headers)
+		self.http.request('POST', settings.URL_LOGOUT, headers=header)
 
 	def save_info(self, info):
 		# 信息持久化
