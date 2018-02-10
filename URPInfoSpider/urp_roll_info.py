@@ -148,7 +148,9 @@ class InfoCollect(object):
 			path = pathlib.Path(setpath)
 			if not path.exists():
 				path.mkdir()
-			image.save(setpath + '/' + stuid + '.jpg')
+			setpath = setpath + '/' + stuid + '.jpg'
+			image.save(setpath)
+			self.logger.info('保存照片>>>{}'.format(setpath))
 
 		# 登出
 		self.http.request('POST', settings.URL_LOGOUT, headers=headers)
