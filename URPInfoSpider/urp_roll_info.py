@@ -13,6 +13,8 @@ import sys
 import logging
 import gevent
 import urllib3
+from PIL import Image
+from io import BytesIO
 from lxml import etree
 
 from URPInfoSpider import db_init
@@ -140,7 +142,8 @@ class InfoCollect(object):
 		# 学籍照片
 		if self.mod_get_roll_img:
 			response_xjzp = self.http.request('GET', settings.URL_XJZP, headers=headers)
-			self.logger.info(response_xjzp.data)
+			image = Image.open(BytesIO(response_xjzp.data))
+			image.save('H:/img.jpg')
 
 		# 登出
 		self.http.request('POST', settings.URL_LOGOUT, headers=headers)
