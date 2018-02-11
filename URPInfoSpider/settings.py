@@ -72,4 +72,4 @@ PATH_IMG_SAVE = 'H:/URPRollPhoto_HEBUST_17'
 MOD_ROLL_INFO = False
 
 # 获取学籍照片
-MOD_ROLL_IMG = True
+MOD_ROLL_IMG = False
