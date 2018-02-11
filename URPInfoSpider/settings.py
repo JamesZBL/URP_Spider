@@ -5,9 +5,9 @@ Created on:18-2-8 20:15
 """
 # 服务器主机名
 # 科大
-SERVER_HOST = 'jw.hebust.edu.cn'
+# SERVER_HOST = 'jw.hebust.edu.cn'
 # 科大理工
-# HOST = 'lgjwxt.hebust.edu.cn'
+SERVER_HOST = 'lgjwxt.hebust.edu.cn'
 
 # 服务器端口号
 SERVER_PORT = 80
@@ -25,27 +25,27 @@ URL_XJXX = '/xjInfoAction.do?oper=xjxx'
 URL_XJZP = '/xjInfoAction.do?oper=img'
 
 # 年级（2位数字，对应学号的第 1-2 位）
-URP_GRADE = 17
+URP_GRADE = 14
 
 # 分隔符（非理工为'',引号中间无空格,且不可省略）
-# URP_SEPARATOR = 'L'
-URP_SEPARATOR = ''
+URP_SEPARATOR = 'L'
+# URP_SEPARATOR = ''
 
 # 学院（理工为学部）（1-2 位数字，对应学号的第 3-4（理工为 4-5）位）
 URP_COLLEGE_START = 1
-URP_COLLEGE_END = 11
+URP_COLLEGE_END = 7
 
 # 专业 （1 位数字，对应学号的第 5-6（理工为 6-7）位）
-URP_MAJOR_START = 1
-URP_MAJOR_END = 7
+URP_MAJOR_START = 51
+URP_MAJOR_END = 52
 
 # 班 （1 位数字，对应学号的第 7（理工为 8）位）
-URP_CLASS_START = 1
-URP_CLASS_END = 9
+URP_CLASS_START = 0
+URP_CLASS_END = 2
 
 # 学号 （1-2 位数字，对应学号的最后 2 位）
-URP_STU_START = 1
-URP_STU_END = 50
+URP_STU_START = 0
+URP_STU_END = 99
 
 # 数据库主机名（数据库必须为 MySQL）
 DB_HOST = 'localhost'
