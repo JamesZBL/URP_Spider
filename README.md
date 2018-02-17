@@ -1,5 +1,5 @@
 # URP 教务系统信息收集工具
-[![](https://badge.juejin.im/entry/5a87ff2ef265da4e826351ae/likes.svg?style=flat-square)](https://juejin.im/post/5a87ff036fb9a0635e3ce71d)
+[![](https://badge.juejin.im/entry/5a80020a6fb9a0635b532804/likes.svg?style=flat-square)](https://juejin.im/post/5a80018df265da4e8a31e80e)
 
 ## 应用实例
 
