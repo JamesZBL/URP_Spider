@@ -25,7 +25,7 @@ URL_XJXX = '/xjInfoAction.do?oper=xjxx'
 URL_XJZP = '/xjInfoAction.do?oper=img'
 
 # 年级（2位数字，对应学号的第 1-2 位）
-URP_GRADE = 14
+URP_GRADE = 17
 
 # 分隔符（非理工为'',引号中间无空格,且不可省略）
 # URP_SEPARATOR = 'L'
@@ -63,10 +63,10 @@ DB_USER = 'root'
 DB_PWD = 'root'
 
 # 表名
-DB_TABLE_NAME = 'URP_INFO_HEBUST_2_14'
+DB_TABLE_NAME = 'URP_INFO_HEBUST_2_17'
 
 # 照片保存路径
-PATH_IMG_SAVE = 'H:/URPRollPhoto_HEBUST_2_14'
+PATH_IMG_SAVE = 'H:/URPRollPhoto_HEBUST_2_17'
 
 # 获取学籍信息
 MOD_ROLL_INFO = True
