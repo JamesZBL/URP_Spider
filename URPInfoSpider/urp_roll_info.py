@@ -140,7 +140,7 @@ class InfoCollect(object):
 	def save_info(self, info):
 		# 信息持久化
 		db = InfoMain.db
-		sql_str = 'INSERT INTO ' + settings.DB_TABLE_NAME + ' VALUES (NULL ,'
+		sql_str = 'INSERT INTO ' + settings.DB_TABLE_NAME + ' VALUES ('
 		for i in info:
 			sql_str += "\'" + str(i) + "\'" + ','
 		sql_str = sql_str[0:len(sql_str) - 1]
